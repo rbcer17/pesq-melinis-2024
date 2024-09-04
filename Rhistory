@@ -1,0 +1,153 @@
+library(readxl)
+chuva_sementes_for_r_single_sheet_all_years <- read_excel("chuva-sementes-for-r-single-sheet-all-years.xlsx")
+View(chuva_sementes_for_r_single_sheet_all_years)
+#dados importados da planilha excel como dados numericos nas seguintes
+#colunas: ano, ambiente, parcela, coleta, bandeja, total, viaveis
+#
+#planilha do drive: chuva-sementes-for-r-single-sheet-all-years.xlsx
+#
+#rotina de importacao:
+#library(readxl)
+#chuva_sementes_for_r_single_sheet_all_years <- read_excel("chuva-sementes-for-r-single-sheet-all-years.xlsx")
+#
+#copiar planilha para objeto melinis-orig
+melinis-orig <- chuva_sementes_for_r_single_sheet_all_years
+#dados importados da planilha excel como dados numericos nas seguintes
+#colunas: ano, ambiente, parcela, coleta, bandeja, total, viaveis
+#
+#planilha do drive: chuva-sementes-for-r-single-sheet-all-years.xlsx
+#
+#rotina de importacao:
+#library(readxl)
+#chuva_sementes_for_r_single_sheet_all_years <- read_excel("chuva-sementes-for-r-single-sheet-all-years.xlsx")
+#
+#copiar planilha para objeto melinis-orig
+melinis <- chuva_sementes_for_r_single_sheet_all_years
+View(melinis)
+#
+#Todos os dados foram importados como numericos. Agora precisa
+#converter dados numericos para classes usando o comando factor:
+# ano, ambiente, coleta
+#no momento nao usar as variaveis parcela e bandeja
+#
+anofac<- factor(ano)
+#
+#Todos os dados foram importados como numericos. Agora precisa
+#converter dados numericos para classes usando o comando factor:
+# ano, ambiente, coleta
+#no momento nao usar as variaveis parcela e bandeja
+#usaremos o comando mutate do pacote dplyr
+library(dplyr)
+melinis %>%
+mutate(anofactor = factor(Ano))
+View(melinis)
+View(melinis)
+View(melinis)
+melinis2 <-melinis %>%
+mutate(anofactor = factor(Ano))
+melinis %>%
+mutate(anofactor = factor(Ano))
+#
+#Todos os dados foram importados como numericos. Agora precisa
+#converter dados numericos para classes usando o comando factor:
+# ano, ambiente, coleta
+#no momento nao usar as variaveis parcela e bandeja
+#usaremos o comando mutate do pacote dplyr
+library(dplyr)
+melinis2 <- melinis %>%
+mutate(anofactor = factor(Ano))
+melinis3 <- melinis2 %>%
+mutate(ambfactor = factor(Ambiente))
+melinis4 <- melinis3 %>%
+mutate(coletfactor = factor(Coleta))
+View(melinis4)
+melinisfac <- melinis4
+#remover objetos temporarios
+rm(melinis2)
+rm(melinis4)
+rm(melinis3)
+View(melinisfac)
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, melinisfac$Ano=3 | melinisfac$Ano=4)
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, Ano=3 | Ano=4)
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, Ano = 3 | Ano =4 )
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, Ano == 3 | Ano ==4 )
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, Ano == 3 & Ano ==4 )
+View(melinistrat34)
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, Ano == 3)
+melinistrat34
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, melinisfac$Ano == 3)
+View(melinisfac)
+#
+#agora selecionar so os dados dos grupos 3 e 4
+melinistrat34 <- subset(melinisfac, Ambiente == 3 | Ambiente == 4)
+melinistrat34
+View(melinistrat34)
+View(melinisfac)
+resultado1 = lm(Viaveis ~ ambfactor, anofactor, data =melinistrat34 )
+resultado1 = lm(Viaveis ~ ambfactor, data =melinistrat34 )
+summary(resultado1)
+resultado1 = lm(Viaveis ~ ambfactor, anofactor,  data =melinistrat34 )
+resultado1 = lm(Viaveis ~ ambfactor + anofactor,  data =melinistrat34 )
+summary(resultado1)
+resultado2 = lm(Total ~ ambfactor + anofactor,  data =melinistrat34 )
+summary(resultado2)
+melinistrat12 <- subset(melinisfac, Ambiente == 1 | Ambiente == 2)
+View(melinistrat12)
+resultado3 = lm(Total ~ ambfactor + anofactor,  data =melinistrat12 )
+summary(resultado3)
+install.packages("xml2")
+View(melinistrat34)
+#agora fazer uns boxplots
+#boxplot(crede,sem_rede, main= "Numero de Frutos em Flores Com ou Sem Rede", names = c("Com Rede", "Sem Rede"))
+#
+library(dplyr)
+group_by(melinistrat34, ambfactor) %>%
+summarise(
+count = n(),
+median = median(score, na.rm = TRUE),
+IQR = IQR(score, na.rm = TRUE)
+)
+group_by(melinistrat34, ambfactor) %>%
+summarise(
+count = n(),
+median = median(Viaveis, na.rm = TRUE),
+IQR = IQR(score, na.rm = TRUE)
+)
+group_by(melinistrat34, ambfactor) %>%
+summarise(
+count = n(),
+median = median(Viaveis, na.rm = TRUE),
+IQR = IQR(Viaveis, na.rm = TRUE)
+)
+# Plot score by posicao and color by posicao
+library("ggpubr")
+ggboxplot(melinistrat34, x = "ambfactor", y = "Viaveis",
+color = "ambfactor", palette = c("#00AFBB", "#E7B800"),
+ylab = "Viaveis", xlab = "Trat")
+boxplot(Viaveis~ambfactor+anofactor, melinistrat34)
+boxplot(Viaveis~interaction(ambfactor, anofactor, lex.order=T), melinistrat34)
+#acertar os niveis para boxplot
+melinistrat34$ambfactor<-factor(melinistrat34$ambfactor, levels=c("3","4"))
+melinistrat34$anofactor<-factor(melinistrat34$anofactor, levels=c("2003","2004","2005"))
+boxplot(Viaveis~interaction(ambfactor, anofactor, lex.order=T), melinistrat34)
+ggboxplot(melinistrat34, x = "ambfactor", y = "Viaveis",
+color = "ambfactor", palette = c("#00AFBB", "#E7B800"),
+ylab = "Viaveis", xlab = "Trat")
+boxplot(Viaveis~ambfactor+anofactor, melinistrat34)
+install.packages("arm")
+View(melinistrat34)
+View(resultado1)
