@@ -1,6 +1,8 @@
 ---
 title: "Projeto John Hay e Carlos Romero"
 output:
+  html_document:
+    df_print: paged
   pdf_document: default
   html_notebook: default
 ---
@@ -14,7 +16,7 @@ rotina de importacao:
 
 ```{r}
 library(readxl)
-consolidado <- read_excel("consolidado-correto.xlsx")
+consolidado <- read_excel('~/rstudio-projects/pesq-melinis-2024/dados/consolidado-correto.xlsx')
 ```
 
 
