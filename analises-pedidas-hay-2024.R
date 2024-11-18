@@ -47,6 +47,7 @@ ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot
 
 #analise percentagem viaveis dentro mesmo ano para tratamentos 1 vs 2 e 3 vs 4
 
+#analise numero bandejas com zero sementes ao longo do tempo
 
 
 
