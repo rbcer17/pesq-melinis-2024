@@ -27,9 +27,10 @@ poissonreg34 <- glm(formula = Viaveis ~ factor(ambfactor) + factor(anofactor), f
 #Comparar chuva sementes 3 4 transformar poisson
 poissonreg34 <- glm(formula = Viaveis ~ factor(ambfactor) + factor(anofactor), family = poisson, data = consol34)
 
-#Comparar percent viaveis 1 2 transformar arcoseno
+#Comparar percent viaveis 1 2 transformar arcoseno ou melhor fazer binomial
+#arcoseno so funciona se os dados nao tiverem muitos zero ou 100
 
-#Comparar  percent viaveis 3 4 transformar arcoseno
+#Comparar  percent viaveis 3 4 transformar arcoseno ou melhor fazer binomial
 
 #for percent viables use binomial regression with cbind for proportions
 
