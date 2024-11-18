@@ -2,6 +2,7 @@ consolidado = as.data.frame (consolidado_correto_chuva_sementes_cobertura)
 consolidado$pcviaveis = (consolidado$Viaveis / consolidado$Total)*100
 consolidado$anofactor = as.factor(consolidado$Ano)
 consolidado$ambientefactor = as.factor(consolidado$Ambiente)
+consolidado$coletafactor = as.factor(consolidado$Coleta)
 
 #Comparar chuva sementes ambiente 1 vs 2 (LC vs HC) pag 7 e pag 11
 #Comparar chuva sementes ambiente 3 vs 4 (FM vs IMM) pag 7
@@ -37,6 +38,11 @@ consol1 <- subset(consol12, Ambiente == 1)
 consol2 <- subset(consol12, Ambiente == 2)
 consol3 <- subset(consol34, Ambiente == 3)
 consol4 <- subset(consol34, Ambiente == 4)
+#boxplots percentagem viaveis dentro mesmo ano
+ggplot(consol1, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+ggplot(consol2, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+ggplot(consol3, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
 
 #analise percentagem viaveis dentro mesmo ano para tratamentos 1 vs 2 e 3 vs 4
 
