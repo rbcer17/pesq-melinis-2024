@@ -4,6 +4,9 @@ consolidado$anofactor = as.factor(consolidado$Ano)
 consolidado$ambientefactor = as.factor(consolidado$Ambiente)
 consolidado$coletafactor = as.factor(consolidado$Coleta)
 
+
+
+consolidado$zerosem = bandejazero(consolidado$Total)
 #Comparar chuva sementes ambiente 1 vs 2 (LC vs HC) pag 7 e pag 11
 #Comparar chuva sementes ambiente 3 vs 4 (FM vs IMM) pag 7
 #fazer primeiro o boxplot 1 vs 2 por ano
@@ -31,6 +34,10 @@ poissonreg34 <- glm(formula = Viaveis ~ factor(ambfactor) + factor(anofactor), f
 #arcoseno so funciona se os dados nao tiverem muitos zero ou 100
 
 #Comparar  percent viaveis 3 4 transformar arcoseno ou melhor fazer binomial
+library(MASS)
+poissonregbinom34 <- glm(formula = pviaveis ~ ambfactor + anofactor, family = binomial, data = consol34pnomiss)
+poissonregbinom34 <- glm(formula = cbind(Viaveis,naoviaveis) ~ ambfactor + anofactor, family = binomial, data = consol34pnomiss)
+poissonregbinom34 <- glm(formula = cbind(Viaveis,naoviaveis) ~ arcobtot, family = binomial, data = consol34pnomiss)
 
 #for percent viables use binomial regression with cbind for proportions
 
@@ -47,11 +54,24 @@ ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot
 
 #analise percentagem viaveis dentro mesmo ano para tratamentos 1 vs 2 e 3 vs 4
 
+
+
 #analise numero bandejas com zero sementes ao longo do tempo
+#criar nova variavel a partir da variavel Total (numero sementes)
+# variavel zerosem com dois valores: 1 se nao tiver sementes, 0 se tiver
 
+consolidado$zerosem = ifelse (consolidado$Total == 0, 1, 0)
+freq_table <- consolidado %>%
+  group_by(Ambiente,Coleta, zerosem) %>%
+  summarise(frequency = n()) %>%
+  arrange(desc(frequency))
 
+contagemzero = as.data.frame(freq_table)
+socontagemzero = subset(contagemzero,zerosem == 1)
+socontagemzero$Coleta=as.factor(socontagemzero$Coleta)
 
-
+ggplot(socontagemzero, aes(fill=Coleta, y=frequency, x=Ambiente)) + 
+  geom_bar(position="dodge", stat="identity")
 
 
 
