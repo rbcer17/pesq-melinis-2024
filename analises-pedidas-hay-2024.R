@@ -25,8 +25,8 @@ ggplot(consol34, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxp
 ggplot(consol34, aes(x=ambientefactor,y=Total, fill = anofactor))+ geom_boxplot()
 
 #Comparar chuva sementes 1 2 transformar poisson
-poissonreg34 <- glm(formula = Viaveis ~ factor(ambfactor) + factor(anofactor), family = poisson, data = consol34)
-
+poissonreg34 <- glm(formula = Viaveis ~ factor(ambientefactor) + factor(anofactor), family = poisson, data = consol34)
+summary(poissonreg34)
 #Comparar chuva sementes 3 4 transformar poisson
 poissonreg34 <- glm(formula = Viaveis ~ factor(ambfactor) + factor(anofactor), family = poisson, data = consol34)
 
@@ -47,6 +47,7 @@ consol2 <- subset(consol12, Ambiente == 2)
 consol3 <- subset(consol34, Ambiente == 3)
 consol4 <- subset(consol34, Ambiente == 4)
 #boxplots percentagem viaveis dentro mesmo ano
+par(mfrow=c(2,2))
 ggplot(consol1, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
 ggplot(consol2, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
 ggplot(consol3, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
@@ -59,7 +60,8 @@ ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot
 #analise numero bandejas com zero sementes ao longo do tempo
 #criar nova variavel a partir da variavel Total (numero sementes)
 # variavel zerosem com dois valores: 1 se nao tiver sementes, 0 se tiver
-
+#######
+#TEM DE REFAZER A ANALISE COM ZERO SEMENTES VIAVEIS (NAO TOTAL)
 consolidado$zerosem = ifelse (consolidado$Total == 0, 1, 0)
 freq_table <- consolidado %>%
   group_by(Ambiente,Coleta, zerosem) %>%
@@ -73,5 +75,19 @@ socontagemzero$Coleta=as.factor(socontagemzero$Coleta)
 ggplot(socontagemzero, aes(fill=Coleta, y=frequency, x=Ambiente)) + 
   geom_bar(position="dodge", stat="identity")
 
+#analise bandejas com zero sementes viaveis ao longo do tempo
+consolidado$zeroviaveis = ifelse (consolidado$Viaveis == 0, 1, 0)
+freq_table2 <- consolidado %>%
+  group_by(Ambiente,Coleta, zeroviaveis) %>%
+  summarise(frequency = n()) %>%
+  arrange(desc(frequency))
 
+contagemzeroviaveis = as.data.frame(freq_table2)
+socontagemzeroviaveis = subset(contagemzeroviaveis,zeroviaveis == 1)
+socontagemzeroviaveis$Coleta=as.factor(socontagemzeroviaveis$Coleta)
+
+ggplot(socontagemzeroviaveis, aes(fill=Coleta, y=frequency, x=Ambiente)) + 
+  geom_bar(position="dodge", stat="identity")
+
+zeroviaveis1 <- subset(consolidado, Ambiente == 1)
 
