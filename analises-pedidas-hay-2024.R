@@ -90,4 +90,56 @@ ggplot(socontagemzeroviaveis, aes(fill=Coleta, y=frequency, x=Ambiente)) +
   geom_bar(position="dodge", stat="identity")
 
 zeroviaveis1 <- subset(consolidado, Ambiente == 1)
+# Fazer a figura 2 no R  boxplot de cobertura total e cobertura melinis por tratamento por ano
+#4 boxplots sendo cada um cobertura total e cobertura melinis por ano ,  um boxplot por tratamento
+# one box per variety
+p2 <- ggplot(consolidado, aes(x=variety, y=note, fill=treatment)) + 
+  geom_boxplot() +
+  facet_wrap(~variety, scale="free")
+#
+# Vamos tentar outra forma, com par mfrow
+#https://bookdown.org/ndphillips/YaRrr/arranging-plots-with-parmfrow-and-layout.html
 
+par(mfrow = c(2, 2)) # Create a 2 x 2 plotting matrix
+# The next 4 plots created will be plotted next to each other
+
+#for ggplot need to use function grid.arrange
+#https://stackoverflow.com/questions/1249548/side-by-side-plots-with-ggplot2
+require(gridExtra)
+plot1=ggplot(consolidado, aes(x=anofactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+plot2=ggplot(consolidado, aes(x=anofactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+plot3=ggplot(consolidado, aes(x=anofactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+plot4=ggplot(consolidado, aes(x=anofactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+
+
+grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
+
+#pivot longer for cobertura
+library(tidyr)
+#https://www.statology.org/pivot_longer-in-r/
+#pivot the data frame into a long format
+coberturapivot = coberturapivot %>% pivot_longer(cols=c('total03', 'total04','total05'),
+                    names_to='ano',
+                    values_to='cobtotal')
+coberturapivot = coberturapivot %>% pivot_longer(cols=c('mm03', 'mm04','mm05'),
+                                                 names_to='anomm',
+                                                 values_to='cobmm')
+coberturapivot = coberturapivot %>% pivot_longer(cols=c('cobtotal', 'cobmm'),
+                                                 names_to='tipocob',  values_to='percob')
+#remove first 5 characters from ano variable
+coberturapivot$ano2 = substr(coberturapivot$ano,6,7)
+#remove colums 3 and 4 from dataframe
+coberturafinal <- coberturapivot[ -c(3:4) ]
+#remove duplicated rows
+cobfinalded <- coberturafinal[!duplicated(coberturafinal), ]
+
+#for ggplot need to use function grid.arrange
+#https://stackoverflow.com/questions/1249548/side-by-side-plots-with-ggplot2
+require(gridExtra)
+plot1=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
+plot2=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
+plot3=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
+plot4=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
+
+
+grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
