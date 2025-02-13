@@ -4,6 +4,7 @@ consolidado$anofactor = as.factor(consolidado$Ano)
 consolidado$ambientefactor = as.factor(consolidado$Ambiente)
 consolidado$coletafactor = as.factor(consolidado$Coleta)
 
+#FAZER FIGS 1 e 3 FINAL FORMATO MS ver pasta geral do projeto
 
 
 consolidado$zerosem = bandejazero(consolidado$Total)
@@ -13,10 +14,12 @@ consolidado$zerosem = bandejazero(consolidado$Total)
 #e o boxplot 3 vs 4 por ano
 consol34 <- subset(consolidado, Ambiente == 3 | Ambiente == 4)
 consol12 <- subset(consolidado, Ambiente == 1 | Ambiente == 2)
+consol34anos20042005 <- subset(consol34, Ano == 2004 | Ano == 2005)
 #boxplot percent viables 1 2
 ggplot(consol12, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
 #boxplot total seed rain 1 3
 ggplot(consol12, aes(x=ambientefactor,y=Total, fill = anofactor))+ geom_boxplot()
+ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot()
 
 #boxplot percent viables 3 4
 ggplot(consol34, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
@@ -25,11 +28,14 @@ ggplot(consol34, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxp
 ggplot(consol34, aes(x=ambientefactor,y=Total, fill = anofactor))+ geom_boxplot()
 
 #Comparar chuva sementes 1 2 transformar poisson
-poissonreg34 <- glm(formula = Viaveis ~ factor(ambientefactor) + factor(anofactor), family = poisson, data = consol34)
-summary(poissonreg34)
+poissonreg12 <- glm(formula = Viaveis ~ factor(ambientefactor) + factor(anofactor), family = poisson, data = consol12)
+summary(poissonreg12)
+anova(poissonreg12)
 #Comparar chuva sementes 3 4 transformar poisson
 poissonreg34 <- glm(formula = Viaveis ~ factor(ambfactor) + factor(anofactor), family = poisson, data = consol34)
-
+poissonreg34so2anos <- glm(formula = Viaveis ~ factor(ambientefactor) + factor(anofactor), family = poisson, data = consol34anos20042005)
+summary(poissonreg34so2anos)
+shapiro.test(poissonreg34so2anos$residuals)
 #Comparar percent viaveis 1 2 transformar arcoseno ou melhor fazer binomial
 #arcoseno so funciona se os dados nao tiverem muitos zero ou 100
 
@@ -46,6 +52,23 @@ consol1 <- subset(consol12, Ambiente == 1)
 consol2 <- subset(consol12, Ambiente == 2)
 consol3 <- subset(consol34, Ambiente == 3)
 consol4 <- subset(consol34, Ambiente == 4)
+poissonreg1 <- glm(formula = Viaveis ~  factor(coletafactor), family = poisson, data = consol1)
+summary(poissonreg1)
+shapiro.test(poissonreg1$residuals)
+#Kruskal Wallis viaveis vs data de coleta
+kruskal.test(Viaveis ~ coletafactor,
+             data = consol1
+)
+kruskal.test(Viaveis ~ coletafactor,
+             data = consol2
+)
+kruskal.test(Viaveis ~ coletafactor,
+             data = consol3
+)
+kruskal.test(Viaveis ~ coletafactor,
+             data = consol4
+)
+
 #boxplots percentagem viaveis dentro mesmo ano
 par(mfrow=c(2,2))
 ggplot(consol1, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
@@ -76,6 +99,7 @@ ggplot(socontagemzero, aes(fill=Coleta, y=frequency, x=Ambiente)) +
   geom_bar(position="dodge", stat="identity")
 
 #analise bandejas com zero sementes viaveis ao longo do tempo
+#refazer a figura com as legendas certas
 consolidado$zeroviaveis = ifelse (consolidado$Viaveis == 0, 1, 0)
 freq_table2 <- consolidado %>%
   group_by(Ambiente,Coleta, zeroviaveis) %>%
