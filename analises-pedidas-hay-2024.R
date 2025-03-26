@@ -21,6 +21,9 @@ ggplot(consol12, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxp
 ggplot(consol12, aes(x=ambientefactor,y=Total, fill = anofactor))+ geom_boxplot()
 ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot()
 
+#fig 1 final com labels corretos
+ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot() + labs(title = "Seed Rain", x = "Treatment", y = "Fertile", fill = "Year")
+
 #boxplot percent viables 3 4
 ggplot(consol34, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
 
