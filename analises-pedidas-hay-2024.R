@@ -12,7 +12,6 @@ consolidado$zerosem = bandejazero(consolidado$Total)
 #Comparar chuva sementes ambiente 3 vs 4 (FM vs IMM) pag 7
 #fazer primeiro o boxplot 1 vs 2 por ano
 #e o boxplot 3 vs 4 por ano
-consol34 <- subset(consolidado, Ambiente == 3 | Ambiente == 4)
 consol12 <- subset(consolidado, Ambiente == 1 | Ambiente == 2)
 consol34anos20042005 <- subset(consol34, Ano == 2004 | Ano == 2005)
 #boxplot percent viables 1 2
@@ -22,7 +21,7 @@ ggplot(consol12, aes(x=ambientefactor,y=Total, fill = anofactor))+ geom_boxplot(
 ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot()
 
 #fig 1 final com labels corretos
-ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot() + labs(title = "Seed Rain", x = "Treatment", y = "Fertile", fill = "Year")
+ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Treatment", y = "Number of full caryopses", fill = "Year")
 
 #boxplot percent viables 3 4
 ggplot(consol34, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
@@ -74,13 +73,29 @@ kruskal.test(Viaveis ~ coletafactor,
 
 #boxplots percentagem viaveis dentro mesmo ano
 par(mfrow=c(2,2))
-ggplot(consol1, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
-ggplot(consol2, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
-ggplot(consol3, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
-ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
 
+#Fig 05 melinis manuscript
+require(gridExtra)
+plot01=ggplot(consol1, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs(title = "A", x = "Treatment", y = "Percent of full caryopses", fill = "Year")
+plot02=ggplot(consol2, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( title = "B", x = "Treatment", y = "Percent of full caryopses", fill = "Year")
+plot03=ggplot(consol3, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs(title = "C" ,x = "Treatment", y = "Percent of full caryopses", fill = "Year")
+plot04=ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs(title = "D", x = "Treatment", y = "Percent of full caryopses", fill = "Year")
+grid.arrange(plot01, plot02, plot03, plot04, ncol=2)
 #analise percentagem viaveis dentro mesmo ano para tratamentos 1 vs 2 e 3 vs 4
 
+#ANALISE Manuscrito FINAL comparar kruskal wallis tratamentos 3 vs 4 anos 2004 2005 percentagem viaveis , e numerototal
+kruskal.test(pcviaveis ~ ambientefactor,
+             data = consol34anos20042005
+)
+kruskal.test(Total ~ ambientefactor,
+             data = consol34anos20042005
+)
+
+# Dentro de cada tratamento comparar o numero total por coleta e ano 2 way
+poissonreg1 <- glm(formula = Total ~ factor(coletafactor) + factor(anofactor), family = poisson, data = consol1)
+summary(poissonreg1)
+anova(poissonreg1)
+# Dentro de cada tratamento comparar o numero de viaveis por coleta e ano 2 way
 
 
 #analise numero bandejas com zero sementes ao longo do tempo
@@ -94,12 +109,16 @@ freq_table <- consolidado %>%
   summarise(frequency = n()) %>%
   arrange(desc(frequency))
 
+# Create boxplot with percentagem viaveis por coleta por ano tratamentos 1 e 2 fig 07
+ggplot(consol12, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year")
+
 contagemzero = as.data.frame(freq_table)
 socontagemzero = subset(contagemzero,zerosem == 1)
 socontagemzero$Coleta=as.factor(socontagemzero$Coleta)
 
 ggplot(socontagemzero, aes(fill=Coleta, y=frequency, x=Ambiente)) + 
   geom_bar(position="dodge", stat="identity")
+
 
 #analise bandejas com zero sementes viaveis ao longo do tempo
 #refazer a figura com as legendas certas
@@ -115,6 +134,11 @@ socontagemzeroviaveis$Coleta=as.factor(socontagemzeroviaveis$Coleta)
 
 ggplot(socontagemzeroviaveis, aes(fill=Coleta, y=frequency, x=Ambiente)) + 
   geom_bar(position="dodge", stat="identity")
+
+#figure 4 final manuscript
+ggplot(socontagemzeroviaveis, aes(fill=Coleta, y=frequency, x=Ambiente)) + 
+  geom_bar(position="dodge", stat="identity") + labs( x = "Treatment", y = "Number of trays", fill = "Collection")
+
 
 zeroviaveis1 <- subset(consolidado, Ambiente == 1)
 # Fazer a figura 2 no R  boxplot de cobertura total e cobertura melinis por tratamento por ano
@@ -163,10 +187,39 @@ cobfinalded <- coberturafinal[!duplicated(coberturafinal), ]
 #for ggplot need to use function grid.arrange
 #https://stackoverflow.com/questions/1249548/side-by-side-plots-with-ggplot2
 require(gridExtra)
+coberturafinal$tipocob <- factor(coberturafinal$tipocob, levels = c("cobtotal", "cobmm"))
+
 plot1=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
 plot2=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
 plot3=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
 plot4=ggplot(coberturafinal, aes(x=ano2,y=percob, fill = tipocob))+ geom_boxplot()
 
-
+plot1
 grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
+
+#fazendo a figura 2 como barplot com media e desvio padrao
+# Summarize data to get mean and SD
+library(dplyr)
+library(ggplot2)
+summary_data <- coberturafinal %>%
+  group_by(trat,ano2,tipocob) %>%
+  summarize(
+    mean_value = mean(percob),
+    sd_value = sd(percob)
+  )
+
+# Create the barplot with error bars fig 2
+# treatment 1 plot
+summary_data1 <- subset(summary_data, trat == 1)
+
+#ggplot(summary_data1, aes(x = ano2, y = mean_value)) +
+  geom_col(fill = "skyblue") +
+  geom_errorbar(aes(ymin = mean_value - sd_value, ymax = mean_value + sd_value), width = 0.2) +
+  labs(x = "Year", y = "Mean Value") +  # Add labels
+  theme_bw()  # Optional: Add a clean theme
+
+#correct barplot https://towardsdatascience.com/grouped-barplot-with-error-bars-in-r-ee87b112204d/
+ggplot(summary_data1,  aes(x = ano2, y = mean_value, fill = tipocob))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)
+
