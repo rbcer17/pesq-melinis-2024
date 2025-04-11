@@ -92,11 +92,19 @@ kruskal.test(Total ~ ambientefactor,
 )
 
 # Dentro de cada tratamento comparar o numero total por coleta e ano 2 way
-poissonreg1 <- glm(formula = Total ~ factor(coletafactor) + factor(anofactor), family = poisson, data = consol1)
+poissonreg1 <- glm(formula = Viaveis ~ factor(coletafactor) + factor(anofactor), family = poisson, data = consol1)
 summary(poissonreg1)
 anova(poissonreg1)
 # Dentro de cada tratamento comparar o numero de viaveis por coleta e ano 2 way
-
+poissonreg2 <- glm(formula = Viaveis ~ factor(coletafactor) + factor(anofactor), family = poisson, data = consol2)
+summary(poissonreg2)
+anova(poissonreg2)
+poissonreg3 <- glm(formula = Viaveis ~ factor(coletafactor) + factor(anofactor), family = poisson, data = consol3)
+summary(poissonreg3)
+anova(poissonreg3)
+poissonreg4 <- glm(formula = Viaveis ~ factor(coletafactor) + factor(anofactor), family = poisson, data = consol4)
+summary(poissonreg4)
+anova(poissonreg4)
 
 #analise numero bandejas com zero sementes ao longo do tempo
 #criar nova variavel a partir da variavel Total (numero sementes)
@@ -164,11 +172,14 @@ plot4=ggplot(consolidado, aes(x=anofactor,y=pcviaveis, fill = anofactor))+ geom_
 
 
 grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
-
+#
+#
+#tem de recalcular este trecho para gerar a cobertura media por ano total e melinis por tratamento
 #pivot longer for cobertura
 library(tidyr)
 #https://www.statology.org/pivot_longer-in-r/
 #pivot the data frame into a long format
+coberturapivot = as.data.frame(data_only_cobertura_2003_a_2005_sent_04may2020)
 coberturapivot = coberturapivot %>% pivot_longer(cols=c('total03', 'total04','total05'),
                     names_to='ano',
                     values_to='cobtotal')
@@ -183,7 +194,9 @@ coberturapivot$ano2 = substr(coberturapivot$ano,6,7)
 coberturafinal <- coberturapivot[ -c(3:4) ]
 #remove duplicated rows
 cobfinalded <- coberturafinal[!duplicated(coberturafinal), ]
-
+# todo este trecho acima tem de ser recalculado
+#
+#Esta parte dos graficos aqui para baixo esta OK
 #for ggplot need to use function grid.arrange
 #https://stackoverflow.com/questions/1249548/side-by-side-plots-with-ggplot2
 require(gridExtra)
