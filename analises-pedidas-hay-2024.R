@@ -180,14 +180,75 @@ library(tidyr)
 #https://www.statology.org/pivot_longer-in-r/
 #pivot the data frame into a long format
 coberturapivot = as.data.frame(data_only_cobertura_2003_a_2005_sent_04may2020)
-coberturapivot = coberturapivot %>% pivot_longer(cols=c('total03', 'total04','total05'),
+coberturapivot1 = coberturapivot %>% pivot_longer(cols=c('total03', 'total04','total05'),
                     names_to='ano',
                     values_to='cobtotal')
-coberturapivot = coberturapivot %>% pivot_longer(cols=c('mm03', 'mm04','mm05'),
+coberturapivot2 = coberturapivot %>% pivot_longer(cols=c('mm03', 'mm04','mm05'),
                                                  names_to='anomm',
                                                  values_to='cobmm')
-coberturapivot = coberturapivot %>% pivot_longer(cols=c('cobtotal', 'cobmm'),
-                                                 names_to='tipocob',  values_to='percob')
+#remove columns 1 to 5 of coberturapivot2
+coberturapivot2 <- coberturapivot2[ -c(1:5) ]
+#add columns dataframe coberturapivot2 to coberturapivot1
+df2 <- cbind(coberturapivot1, coberturapivot2)
+#recode ano to have just numbers
+df2$anocal = substr(df2$ano,6,7)
+#pivot to have cobertura single variable
+df3 = df2 %>% pivot_longer(cols=c('cobtotal', 'cobmm'),
+                                                  names_to='tipocob',
+                                                  values_to='percob')
+#remove cols 3 4 5 6 7 from df3
+df4 <- df3 [ -c(3:7) ]
+
+#agora vamos usar o dataframe df4 para replicar a figura 3 do paper com sigmaplot
+df4$tipocob <- factor(df4$tipocob, levels = c("cobtotal", "cobmm"))
+con1 <- subset(df4, trat == 1)
+con2 <- subset(df4, trat == 2)
+con3 <- subset(df4, trat == 3)
+con4 <- subset(df4, trat == 4)
+require(gridExtra)
+#BOXPLOTS
+plot1=ggplot(con1, aes(x=anocal,y=percob, fill = tipocob))+ geom_boxplot()
+plot2=ggplot(con2, aes(x=anocal,y=percob, fill = tipocob))+ geom_boxplot()
+plot3=ggplot(con3, aes(x=anocal,y=percob, fill = tipocob))+ geom_boxplot()
+plot4=ggplot(con4, aes(x=anocal,y=percob, fill = tipocob))+ geom_boxplot()
+
+plot1
+grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
+#BARPLOT WITH ERROR BARS
+#calculate mean values of y
+library(dplyr)
+library(ggplot2)
+summary_data2 <- df4 %>%
+  group_by(trat,anocal,tipocob) %>%
+  summarize(
+    mean_value = mean(percob),
+    sd_value = sd(percob)
+  )
+#Now do the plots
+conb1 <- subset(summary_data2, trat == 1)
+conb2 <- subset(summary_data2, trat == 2)
+conb3 <- subset(summary_data2, trat == 3)
+conb4 <- subset(summary_data2, trat == 4)
+
+bplot1 =ggplot(conb1,  aes(x = anocal, y = mean_value, fill = tipocob))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
+bplot2 =ggplot(conb2,  aes(x = anocal, y = mean_value, fill = tipocob))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
+bplot3 =ggplot(conb3,  aes(x = anocal, y = mean_value, fill = tipocob))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
+bplot4 =ggplot(conb4,  aes(x = anocal, y = mean_value, fill = tipocob))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
+grid.arrange(bplot1, bplot2, bplot3, bplot4, ncol=2)
+#to do for final:
+# y axis % cover
+# x axis full year
+# remove tipo cobertura side bar
+#coberturapivot = coberturapivot %>% pivot_longer(cols=c('cobtotal', 'cobmm'),
+ #                                                names_to='tipocob',  values_to='percob')
 #remove first 5 characters from ano variable
 coberturapivot$ano2 = substr(coberturapivot$ano,6,7)
 #remove colums 3 and 4 from dataframe
