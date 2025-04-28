@@ -118,7 +118,7 @@ freq_table <- consolidado %>%
   arrange(desc(frequency))
 
 # Create boxplot with percentagem viaveis por coleta por ano tratamentos 1 e 2 fig 07
-ggplot(consol12, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year")
+ggplot(consol12, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") + ggtitle("A")
 
 contagemzero = as.data.frame(freq_table)
 socontagemzero = subset(contagemzero,zerosem == 1)
@@ -176,7 +176,7 @@ grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
 #
 #tem de recalcular este trecho para gerar a cobertura media por ano total e melinis por tratamento
 #pivot longer for cobertura
-library(tidyr)
+library(tidyverse)
 #https://www.statology.org/pivot_longer-in-r/
 #pivot the data frame into a long format
 coberturapivot = as.data.frame(data_only_cobertura_2003_a_2005_sent_04may2020)
@@ -201,6 +201,9 @@ df4 <- df3 [ -c(3:7) ]
 
 #agora vamos usar o dataframe df4 para replicar a figura 3 do paper com sigmaplot
 df4$tipocob <- factor(df4$tipocob, levels = c("cobtotal", "cobmm"))
+#mydat_tibble <- mydat_tibble %>% 
+#  rename(Years_From_Diagnosis = Yrs_From_Dx)
+
 con1 <- subset(df4, trat == 1)
 con2 <- subset(df4, trat == 2)
 con3 <- subset(df4, trat == 3)
@@ -214,34 +217,47 @@ plot4=ggplot(con4, aes(x=anocal,y=percob, fill = tipocob))+ geom_boxplot()
 
 plot1
 grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
-#BARPLOT WITH ERROR BARS
+#BARPLOT WITH ERROR BARS FIGURE 3 FINAL
 #calculate mean values of y
 library(dplyr)
 library(ggplot2)
 summary_data2 <- df4 %>%
   group_by(trat,anocal,tipocob) %>%
   summarize(
-    mean_value = mean(percob),
+    percent_cover = mean(percob),
     sd_value = sd(percob)
   )
-#Now do the plots
+#Rename the variables according to the plot
+summary_data2 <- summary_data2 %>% rename(coverage = tipocob)
+summary_data2 <- summary_data2 %>% rename(year = anocal)
+library(forcats)
+summary_data2$coverage <- fct_recode(summary_data2$coverage,
+                         "total" = "cobtotal",  # Renaming "cobtotal" to "total"
+                         "melinis" = "cobmm")  # Renaming "cobmm" to "melinis"
+summary_data2$year <- fct_recode(summary_data2$year,
+                                     "2003" = "03",  # Renaming "03" to "2003"
+                                     "2004" = "04", # Renaming "04" to "2004"
+                                     "2005" = "05")  # Renaming "05" to "2005"
+
+
+#Now do the plots FIGURE 3 FINAL
 conb1 <- subset(summary_data2, trat == 1)
 conb2 <- subset(summary_data2, trat == 2)
 conb3 <- subset(summary_data2, trat == 3)
 conb4 <- subset(summary_data2, trat == 4)
 
-bplot1 =ggplot(conb1,  aes(x = anocal, y = mean_value, fill = tipocob))+
-  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
-                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
-bplot2 =ggplot(conb2,  aes(x = anocal, y = mean_value, fill = tipocob))+
-  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
-                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
-bplot3 =ggplot(conb3,  aes(x = anocal, y = mean_value, fill = tipocob))+
-  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
-                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
-bplot4 =ggplot(conb4,  aes(x = anocal, y = mean_value, fill = tipocob))+
-  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
-                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)                                                                                                   
+bplot1 =ggplot(conb1,  aes(x = year, y = percent_cover, fill = coverage))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = percent_cover-sd_value, ymax = percent_cover+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)  + ggtitle("A") + labs( x = "Year", y = "Percent Cover")                                                                                                
+bplot2 =ggplot(conb2,  aes(x = year, y = percent_cover, fill = coverage))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = percent_cover-sd_value, ymax = percent_cover+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)   + ggtitle("B") + labs( x = "Year", y = "Percent Cover")                                                                                               
+bplot3 =ggplot(conb3,  aes(x = year, y = percent_cover, fill = coverage))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = percent_cover-sd_value, ymax = percent_cover+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)  + ggtitle("C")  + labs( x = "Year", y = "Percent Cover")                                                                                               
+bplot4 =ggplot(conb4,  aes(x = year, y = percent_cover, fill = coverage))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = percent_cover-sd_value, ymax = percent_cover+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)   + ggtitle("D")  + labs( x = "Year", y = "Percent Cover")                                                                                              
 grid.arrange(bplot1, bplot2, bplot3, bplot4, ncol=2)
 #to do for final:
 # y axis % cover
@@ -296,4 +312,35 @@ summary_data1 <- subset(summary_data, trat == 1)
 ggplot(summary_data1,  aes(x = ano2, y = mean_value, fill = tipocob))+
   geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = mean_value-sd_value, ymax = mean_value+sd_value),
                                                                                                        position =  position_dodge(width = 0.5), width = 0.2)
+#BARPLOT WITH ERROR BARS FIGURE 6 FINAL
+#calculate mean values of y
+library(dplyr)
+library(ggplot2)
+fig6data = as.data.frame(data_fig_6_28apr2025)
+fig6data$trat = as.factor(fig6data$trat)
+fig6data$year = as.factor(fig6data$year)
+summary_data6 <- fig6data %>%
+  group_by(trat,year) %>%
+  summarize(
+    number_of_trays = mean(trays),
+    sd_value = sd(trays)
+  )
+#Now do the plots FIGURE 6 FINAL
+conc1 <- subset(summary_data6, trat == 1)
+conc2 <- subset(summary_data6, trat == 2)
+conc3 <- subset(summary_data6, trat == 3)
+conc4 <- subset(summary_data6, trat == 4)
+cplot1 =ggplot(conc1,  aes(x = year, y = number_of_trays, fill = year))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = number_of_trays-sd_value, ymax = number_of_trays+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)  + ggtitle("A") + labs( x = "Year", y = "Number of trays")                                                                                               
+cplot2 =ggplot(conc2,  aes(x = year, y = number_of_trays, fill=year))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = number_of_trays-sd_value, ymax = number_of_trays+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)   + ggtitle("B") + labs( x = "Year", y = "Number of trays")                                                                                             
+cplot3 =ggplot(conc3,  aes(x = year, y = number_of_trays, fill=year))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = number_of_trays-sd_value, ymax = number_of_trays+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)  + ggtitle("C") + labs( x = "Year", y = "Number of trays")                                                                                              
+cplot4 =ggplot(conc4,  aes(x = year, y = number_of_trays, fill=year))+
+  geom_col( position = "dodge", width = 0.5, alpha = 0.5, color = "black", size = 0.1) + geom_errorbar(aes(ymin = number_of_trays-sd_value, ymax = number_of_trays+sd_value),
+                                                                                                       position =  position_dodge(width = 0.5), width = 0.2)   + ggtitle("D") + labs( x = "Year", y = "Number of trays")                                                                                               
+grid.arrange(cplot1, cplot2, cplot3, cplot4, ncol=2)
 
