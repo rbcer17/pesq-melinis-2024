@@ -16,7 +16,7 @@ consol12 <- subset(consolidado, Ambiente == 1 | Ambiente == 2)
 consol34 <- subset(consolidado, Ambiente == 3 | Ambiente == 4)
 consol34anos20042005 <- subset(consol34, Ano == 2004 | Ano == 2005)
 #boxplot percent viables 1 2
-ggplot(consol12, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
+ggplot(consol12, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()  +guides(fill = "none")
 #boxplot total seed rain 1 3
 ggplot(consol12, aes(x=ambientefactor,y=Total, fill = anofactor))+ geom_boxplot()
 ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot()
