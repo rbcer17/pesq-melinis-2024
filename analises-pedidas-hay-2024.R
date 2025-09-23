@@ -120,6 +120,9 @@ freq_table <- consolidado %>%
 
 # Create boxplot with percentagem viaveis por coleta por ano tratamentos 1 e 2 fig 07
 ggplot(consol12, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") + ggtitle("A")
+# OLD FIGURE 7 RECODED AS REFEREES REQUESTED
+ggplot(consol12, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year")
++ ggtitle("A")
 
 contagemzero = as.data.frame(freq_table)
 socontagemzero = subset(contagemzero,zerosem == 1)

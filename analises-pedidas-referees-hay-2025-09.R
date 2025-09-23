@@ -1,4 +1,5 @@
 consolidado = as.data.frame (consolidado_correto_chuva_sementes_cobertura)
+consolidado = as.data.frame(teste_fig_4_reviewed_consolidado_correto_chuva_sementes_cobertura)
 consolidado$pcviaveis = (consolidado$Viaveis / consolidado$Total)*100
 consolidado$anofactor = as.factor(consolidado$Ano)
 consolidado$ambientefactor = as.factor(consolidado$Ambiente)
@@ -21,8 +22,21 @@ ggplot(consol12, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxp
 ggplot(consol12, aes(x=ambientefactor,y=Total, fill = anofactor))+ geom_boxplot()
 ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot()
 
-#fig 1 final com labels corretos
-ggplot(consolidado, aes(x=ambientefactor,y=Viaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Treatment", y = "Number of full caryopses", fill = "Year")
+#AGORA FIG 4 OLD NEW FIG 3 REVISED MS COLORBLIND FRIENDLY REMOVE GUIDE FILL
+#  RECODED TREATMENT FROM NUMBER TO NAMES
+# Recode 'A' to 'Group 1', 'B' to 'Group 2', and combine 'C' and 'D' into 'Other'
+library(forcats) # For factor manipulation
+consolidado$treatment_name <- fct_recode(consolidado$ambientefactor, "LC" = "1", "HC" = "2", "FM" = "3", "IMM" = "4")
+
+# Use the recoded variable in ggplot
+#ggplot(data, aes(x = category_recoded
+ggplot(consolidado, aes(x=treatment_name,y=Viaveis, fill = anofactor))+ geom_boxplot() + 
+  scale_fill_viridis_d(option = "D") +  # Discrete viridis palette
+  guides(fill = "none") +
+  scale_x_discrete(drop = FALSE) + # Crucial for showing empty levels
+  scale_fill_discrete(drop = FALSE) +
+  theme_classic() +
+  labs( x = "Treatment", y = "Number of full caryopses", fill = "Year")
 
 #boxplot percent viables 3 4
 ggplot(consol34, aes(x=ambientefactor,y=pcviaveis, fill = anofactor))+ geom_boxplot()
@@ -120,7 +134,30 @@ freq_table <- consolidado %>%
 
 # Create boxplot with percentagem viaveis por coleta por ano tratamentos 1 e 2 fig 07
 ggplot(consol12, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") + ggtitle("A")
+# OLD FIGURE 7 RECODED AS REFEREES REQUESTED IS NEW FIGURE 4
+library(RColorBrewer)
+#Palettes like "Set2", "Dark2" and "Paired" are generally safe.
 
+require(gridExtra)
+plot71= ggplot(consol1, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
+   ggtitle("Low Coverage") + scale_fill_brewer(palette = "Dark2") +
+   guides(fill = "none") +
+   theme_classic()
+
+plot72 = ggplot(consol2, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
+  ggtitle("High Coverage") + scale_fill_brewer(palette = "Dark2") +
+  guides(fill = "none") +
+  theme_classic()
+plot73 = ggplot(consol3, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
+  ggtitle("Fire May") + scale_fill_brewer(palette = "Dark2") +
+  guides(fill = "none") +
+  theme_classic()
+plot74 = ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
+  ggtitle("Integrated Management May") + scale_fill_brewer(palette = "Dark2") +
+  guides(fill = "none") +
+  theme_classic()
+grid.arrange(plot71, plot72, plot73, plot74, ncol=2)
+#
 contagemzero = as.data.frame(freq_table)
 socontagemzero = subset(contagemzero,zerosem == 1)
 socontagemzero$Coleta=as.factor(socontagemzero$Coleta)
@@ -145,7 +182,8 @@ ggplot(socontagemzeroviaveis, aes(fill=Coleta, y=frequency, x=Ambiente)) +
   geom_bar(position="dodge", stat="identity")
 
 #figure 4 final manuscript
-ggplot(socontagemzeroviaveis, aes(fill=Coleta, y=frequency, x=Ambiente)) + 
+ggplot(socontagemzeroviaveis, aes(fill=Coleta, y=frequency, x=Ambiente)) +
+  scale_fill_viridis_d(option = "D") +  # Discrete viridis palette
   geom_bar(position="dodge", stat="identity") + labs( x = "Treatment", y = "Number of trays", fill = "Collection")
 
 
