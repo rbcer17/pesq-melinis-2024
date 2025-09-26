@@ -22,10 +22,10 @@ make_panel_plot <- function(panel_id) {
   dat <- subset(df, Panel == panel_id)
   
   ggplot(dat, aes(x = factor(Year), y = Cover, fill = Group)) +
-    geom_bar(stat = "identity", position = position_dodge(0.9), color = "black") +
+    geom_bar(stat = "identity", position = position_dodge(0.9), color = "grey") +
     geom_errorbar(aes(ymin = Cover - SE, ymax = Cover + SE),
                   position = position_dodge(0.9), width = 0.2) +
-    scale_fill_manual(values = c("Black" = "black", "White" = "white")) +
+    scale_fill_manual(values = c("Black" = "grey", "White" = "white")) +
     labs(x = "Year", y = "% Cover") +
     ylim(0, 105) +
     ggtitle(panel_id) +  # Use ggtitle for top-centered panel labels
