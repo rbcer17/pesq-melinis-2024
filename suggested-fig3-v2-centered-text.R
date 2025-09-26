@@ -1,3 +1,5 @@
+#EXAMPLE SCRIPT USING theoretical data
+#TO MAKE THE PLOT RUN THIS SCRIPT WITH THE REAL DATA AND CALL THE DATAFRAME df
 # Load packages
 library(ggplot2)
 library(patchwork)
@@ -16,7 +18,7 @@ df <- data.frame(
   Group = rep(c("Black", "White"), each = 3, times = 4),
   Panel = rep(c("Low Coverage", "High Coverage", "Fire May", "Int Mgmt May"), each = 6)
 )
-
+df = summary_data2
 # Function to create individual panel
 make_panel_plot <- function(panel_id) {
   dat <- subset(df, Panel == panel_id)
@@ -51,9 +53,10 @@ final_plot <- (pA + pB) / (pC + pD)
 
 # Show the plot
 print(final_plot)
+# END EXAMPLE SCRIPT
 
+# HOW TO PREPARE THE REAL DATA
 
-#USING THE REAL DATA
 library(tidyverse)
 #https://www.statology.org/pivot_longer-in-r/
 #pivot the data frame into a long format
@@ -95,6 +98,7 @@ plot4=ggplot(con4, aes(x=anocal,y=percob, fill = tipocob))+ geom_boxplot()
 
 plot1
 grid.arrange(plot1, plot2, plot3, plot4, ncol=2)
+
 #BARPLOT WITH ERROR BARS FIGURE 3 FINAL
 #calculate mean values of y
 library(dplyr)
@@ -105,15 +109,29 @@ summary_data2 <- df4 %>%
     percent_cover = mean(percob),
     sd_value = sd(percob)
   )
+#Recode trat to factor
+summary_data2$Panel = as.factor(summary_data2$Panel)
 #Rename the variables according to the plot
-summary_data2 <- summary_data2 %>% rename(coverage = tipocob)
-summary_data2 <- summary_data2 %>% rename(year = anocal)
+summary_data2 <- summary_data2 %>% rename(Group = tipocob)
+summary_data2 <- summary_data2 %>% rename(Year = anocal)
+summary_data2 <- summary_data2 %>% rename(Cover = percent_cover)
+summary_data2 <- summary_data2 %>% rename(SE = sd_value)
+summary_data2 <- summary_data2 %>% rename(Panel = trat)
+
+
+
 library(forcats)
-summary_data2$coverage <- fct_recode(summary_data2$coverage,
-                                     "total" = "cobtotal",  # Renaming "cobtotal" to "total"
-                                     "melinis" = "cobmm")  # Renaming "cobmm" to "melinis"
-summary_data2$year <- fct_recode(summary_data2$year,
+summary_data2$Group <- fct_recode(summary_data2$Group,
+                                     "Black" = "cobtotal",  # Renaming "cobtotal" to "total"
+                                     "White" = "cobmm")  # Renaming "cobmm" to "melinis"
+summary_data2$Year <- fct_recode(summary_data2$Year,
                                  "2003" = "03",  # Renaming "03" to "2003"
                                  "2004" = "04", # Renaming "04" to "2004"
                                  "2005" = "05")  # Renaming "05" to "2005"
+summary_data2$Panel <- fct_recode(summary_data2$Panel,
+                                 "Low Coverage" = "1",  # Renaming "1" to "Low Coverage"
+                                 "High Coverage" = "2", # Renaming "2" to "High Coverage"
+                                 "Fire May" = "3", # Renaming "3" to "Fire May"
+                                 "Int Mgmt May" = "4")  # Renaming "4" to "Int Mgmt May"
 
+# COPY summary_data dataframe to a dataframe called df and plot

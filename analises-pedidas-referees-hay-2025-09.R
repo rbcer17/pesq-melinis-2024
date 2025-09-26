@@ -383,3 +383,41 @@ cplot4 =ggplot(conc4,  aes(x = year, y = number_of_trays, fill=year))+
                                                                                                        position =  position_dodge(width = 0.5), width = 0.2)   + ggtitle("D") + labs( x = "Year", y = "Number of trays")                                                                                               
 grid.arrange(cplot1, cplot2, cplot3, cplot4, ncol=2)
 
+# FRIEDMAN 2 WAY ANOVA (Repeated Measures) comparing treatment and date of collection for total viable seeds
+#https://stackoverflow.com/questions/21457505/friedman-test-unreplicated-complete-block-design-error
+table(consolidado$ambientefactor, consolidado$coletafactor)
+#sorted consolidado by ambiente
+consolidado_sorted_coletafactor <- consolidado[order(consolidado$coletafactor), ]
+consolidado_sorted_ambientefactor <- consolidado_sorted_coletafactor[order(consolidado_sorted_coletafactor$ambientefactor), ]
+consolidado_sorted_ambientefactor <- na.omit(consolidado_sorted_ambientefactor)
+consolidado_sorted_ambientefactor$ambientefactor = as.factor(consolidado_sorted_ambientefactor$ambientefactor)
+consolidado_sorted_ambientefactor$coletafactor = as.factor(consolidado_sorted_ambientefactor$coletafactor)
+
+consol123 <- subset(consolidado, Ambiente == 1 | Ambiente == 2 | Ambiente == 3)
+friedman.test(Viaveis ~ ambientefactor | coletafactor, data = consolidado_sorted_ambientefactor)
+
+
+#USING NESTED ANOVA
+model <- glm(Viaveis ~ ambientefactor + Error(ambientefactor/coletafactor), data = consolidado)
+summary(model)
+library(lme4)
+mixed_model <- glmer(Viaveis ~ ambientefactor + (1|ambientefactor:coletafactor), data = consolidado,family = poisson)
+summary(mixed_model)
+library(lmerTest)
+anova(mixed_model)
+shapiro.test(residuals(mixed_model))
+
+
+#USING NONPARAMETRIC NESTED ANOVA
+library(rcompanion)
+scheirerRayHare(Viaveis ~ coletafactor * ambientefactor, consolidado)
+#DV:  Viaveis 
+#Observations:  528 
+#D:  0.9936027 
+#MS total:  23276 
+
+#Df  Sum Sq       H p.value
+#coletafactor                  2 1521414  65.785  0.0000
+#ambientefactor                3 6760254 292.309  0.0000
+#coletafactor:ambientefactor   6   59671   2.580  0.8594
+#Residuals                   516 3846641 
