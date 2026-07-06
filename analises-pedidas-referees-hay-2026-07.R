@@ -449,7 +449,7 @@ consol123 <- subset(consolidado, Ambiente == 1 | Ambiente == 2 | Ambiente == 3)
 friedman.test(Viaveis ~ ambientefactor | coletafactor, data = consolidado_sorted_ambientefactor)
 
 
-#USING NESTED ANOVA
+#USING NESTED ANOVA WITH BETA 
 model <- glm(Viaveis ~ ambientefactor + Error(ambientefactor/coletafactor), data = consolidado)
 summary(model)
 library(lme4)
@@ -473,3 +473,28 @@ scheirerRayHare(Viaveis ~ coletafactor * ambientefactor, consolidado)
 #ambientefactor                3 6760254 292.309  0.0000
 #coletafactor:ambientefactor   6   59671   2.580  0.8594
 #Residuals                   516 3846641 
+
+#NEW STATISTICAL ANALYSES USING MIXED MODEL GLMER
+#Create unique coding for random effect parcela and nested effect coleta
+consolidado$uniq_coleta <- factor(paste(consolidado$Parcela, consolidado$Coleta, sep = "_"))
+# Fixed Main Effect: Ano Ambiente
+# Random Factor: (1 | Parcela)
+# Random Nested Effect: (1 | Site:Plot) OR (1 | uniq_colet)
+model <- glmer(Viaveis ~ ambientefactor + anofactor + (1 | Parcela) + (1 | uniq_coleta), data = consolidado, family = poisson(link = "log"))
+# 4. Generate the ANOVA Table
+# Use Type III tests if your data has unequal sample sizes per group
+anova_table <- anova(model, type = "III")
+print(anova_table)
+
+# 5. Extract Random Effects (Variance Components)
+# This reveals how much variation is added by Site and Plot levels
+summary(model)
+
+#REPEAT ANALYSIS USING PERCENTAGE OF FULL CARYOPSIS AMONG YEARS AND TREATMENTS
+consolidado$propviaveis= consolidado$pcviaveis/100
+consolidado$propviaveis[is.na(consolidado$propviaveis)] <- 0
+
+model2 <- glm(propviaveis ~ ambientefactor + anofactor + (1 | Parcela) + (1 | uniq_coleta), data = consolidado, family=beta_family(link = "logit"))
+anova_table <- anova(model, type = "III")
+print(anova_table)
+summary(model)
