@@ -151,7 +151,7 @@ library(RColorBrewer)
 #Palettes like "Set2", "Dark2" and "Paired" are generally safe.
 
 #####################
-#FIGURE 4 REVISION 2026 07
+#FIGURE 4 REVISION 2026 07 DO NOT USE THIS ONE
 require(gridExtra)
 plot71= ggplot(consol1, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geom_boxplot() + labs( x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
    ggtitle("Low Coverage") + scale_fill_brewer(palette = "Dark2") +
@@ -172,14 +172,14 @@ plot74 = ggplot(consol4, aes(x=coletafactor,y=pcviaveis, fill = anofactor))+ geo
   theme_classic()
 grid.arrange(plot71, plot72, plot73, plot74, ncol=2)
 ################
-##NEW FIGURE 4 revision 2026 07
+##NEW FIGURE 4 revision 2026 07 USE THIS ONE
 #THIS INCLUDES ZEROS IN FILL CATEGORIES AND X AXIS CATEGORIES
 require(gridExtra)
 plot71 = ggplot(consol1, aes(x = coletafactor, y = pcviaveis, fill = anofactor)) + 
   geom_boxplot() + 
   scale_x_discrete(drop = FALSE) + 
   # Crucial: Keeps empty fill levels in the legend
-  scale_fill_brewer(palette = "Dark2", drop = FALSE) + 
+  scale_fill_viridis_d(option = "D", drop = FALSE) +
   labs(x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
   ggtitle("Low Coverage") + 
   theme_classic() # Note: guides(fill = "none") removed so the legend actually shows up
@@ -187,7 +187,7 @@ plot72 = ggplot(consol2, aes(x = coletafactor, y = pcviaveis, fill = anofactor))
   geom_boxplot() + 
   scale_x_discrete(drop = FALSE) + 
   # Crucial: Keeps empty fill levels in the legend
-  scale_fill_brewer(palette = "Dark2", drop = FALSE) + 
+  scale_fill_viridis_d(option = "D", drop = FALSE) + 
   labs(x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
   ggtitle("High Coverage") + 
   theme_classic() # Note: guides(fill = "none") removed so the legend actually shows up
@@ -195,7 +195,7 @@ plot73 = ggplot(consol3, aes(x = coletafactor, y = pcviaveis, fill = anofactor))
   geom_boxplot() + 
   scale_x_discrete(drop = FALSE) + 
   # Crucial: Keeps empty fill levels in the legend
-  scale_fill_brewer(palette = "Dark2", drop = FALSE) + 
+  scale_fill_viridis_d(option = "D", drop = FALSE) + 
   labs(x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
   ggtitle("Fire May") + 
   theme_classic() # Note: guides(fill = "none") removed so the legend actually shows up
@@ -203,7 +203,7 @@ plot74 = ggplot(consol4, aes(x = coletafactor, y = pcviaveis, fill = anofactor))
   geom_boxplot() + 
   scale_x_discrete(drop = FALSE) + 
   # Crucial: Keeps empty fill levels in the legend
-  scale_fill_brewer(palette = "Dark2", drop = FALSE) + 
+  scale_fill_viridis_d(option = "D", drop = FALSE) + 
   labs(x = "Collection", y = "Percentage of full caryopses", fill = "Year") +
   ggtitle("Integrated Management May") + 
   theme_classic() # Note: guides(fill = "none") removed so the legend actually shows up
