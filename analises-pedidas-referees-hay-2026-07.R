@@ -477,6 +477,7 @@ scheirerRayHare(Viaveis ~ coletafactor * ambientefactor, consolidado)
 #NEW STATISTICAL ANALYSES USING MIXED MODEL GLMER
 #Create unique coding for random effect parcela and nested effect coleta
 consolidado$uniq_coleta <- factor(paste(consolidado$Parcela, consolidado$Coleta, sep = "_"))
+library(lme4)
 # Fixed Main Effect: Ano Ambiente
 # Random Factor: (1 | Parcela)
 # Random Nested Effect: (1 | Site:Plot) OR (1 | uniq_colet)
@@ -494,7 +495,7 @@ summary(model)
 consolidado$propviaveis= consolidado$pcviaveis/100
 consolidado$propviaveis[is.na(consolidado$propviaveis)] <- 0
 
-model2 <- glm(propviaveis ~ ambientefactor + anofactor + (1 | Parcela) + (1 | uniq_coleta), data = consolidado, family=beta_family(link = "logit"))
-anova_table <- anova(model, type = "III")
+model2 <- glmer(propviaveis ~ ambientefactor + anofactor + (1 | Parcela) + (1 | uniq_coleta), data = consolidado, family=binomial(link = "logit"))
+anova_table <- anova(model2, type = "III")
 print(anova_table)
-summary(model)
+summary(model2)
